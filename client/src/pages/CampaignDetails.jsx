@@ -25,6 +25,7 @@ const CampaignDetails = () => {
     contract,
     address,
     donate,
+    withdraw,
     deleteCampaign,
     campaigns,
     isLoading,
@@ -138,6 +139,34 @@ const CampaignDetails = () => {
     navigate("/");
     setIsLoading(false);
   };
+  const isOwner = String(campaign?.owner || '').toLowerCase() === String(address || '').toLowerCase();
+  const canWithdraw = Number(campaign?.amountCollected || 0) > 0 && Number(campaign?.deadline || 0) < Date.now();
+
+  const handleWithdraw = async () => {
+    if (!isOwner) return;
+    if (!canWithdraw) {
+      toast.error("Cannot withdraw yet (needs funds and after deadline)", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+      return;
+    }
+    try {
+      setIsLoading(true);
+      await withdraw(campaign?.id);
+      navigate("/");
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const remainingDays = daysLeft(campaign?.deadline);
 
   const contractAddr = campaign?.contractAddress || (window.ethereum?.selectedAddress || "0xYourDemoContractAddress");
@@ -236,26 +265,52 @@ const CampaignDetails = () => {
           </div>
         </div>
 
-        {/* Right column: funding box */}
+        {/* Right column: actions */}
         <div className="flex-1">
-          <h4 className="font-epilogue font-semibold text-lg text-black dark:text-white uppercase">Fund</h4>
-          <div className=" mt-5 flex flex-col p-5 bg-[#f2f2f2] dark:bg-[#1c1c24] rounded-xl ">
-            <p className=" font-epilogue font-medium text-[20px ] leading-8 text-center text-[#4d4d4d] dark:text-[#808191] ">Fund the campaign</p>
-            <div className="mt-6">
-              <FormField labelName="Amount" placeholder="ETH 0.1" inputType="number" value={amount} handleChange={(e) => setAmount(e.target.value)} />
-              <div className="my-5 p-4 bg-[#eaeaea] dark:bg-[#13131a] rounded-xl ">
-                <h4 className="font-epilogue font-semibold text-sm leading-[22px] text-black dark:text-white ">Empower change. Support now.</h4>
-                <p className=" mt-5 font-epilogue font-normal leading-[22px] text-[#4d4d4d] dark:text-[#808191] ">Transform lives, shape the future. Your donation fuels progress. Join us, make an impact.</p>
+          {isOwner ? (
+            <>
+              <h4 className="font-epilogue font-semibold text-lg text-black dark:text-white uppercase">Manage</h4>
+              <div className=" mt-5 flex flex-col p-5 bg-[#f2f2f2] dark:bg-[#1c1c24] rounded-xl gap-3">
+                <CustomButton
+                  btnType="button"
+                  title="Withdraw"
+                  styles={`w-full ${canWithdraw ? 'bg-[#6F01Ec]' : 'bg-gray-400 cursor-not-allowed'}`}
+                  isDisabled={!canWithdraw}
+                  handleClick={handleWithdraw}
+                />
+                <CustomButton
+                  btnType="button"
+                  title="Delete Campaign"
+                  styles={`w-full bg-[#e00b0b]`}
+                  handleClick={handleDelete}
+                />
+                {!canWithdraw && (
+                  <p className="text-xs text-[#4d4d4d] dark:text-[#808191]">Withdraw enabled only after deadline and if funds exist.</p>
+                )}
               </div>
-              <CustomButton
-                btnType="button"
-                title={remainingDays === 0 ? "Deadline Reached" : "Fund Campaign"}
-                styles={`w-full bg-[#6F01Ec] ${remainingDays === 0 && "!text-white"}`}
-                isDisabled={remainingDays === 0}
-                handleClick={handleDonate}
-              />
-            </div>
-          </div>
+            </>
+          ) : (
+            <>
+              <h4 className="font-epilogue font-semibold text-lg text-black dark:text-white uppercase">Fund</h4>
+              <div className=" mt-5 flex flex-col p-5 bg-[#f2f2f2] dark:bg-[#1c1c24] rounded-xl ">
+                <p className=" font-epilogue font-medium text-[20px ] leading-8 text-center text-[#4d4d4d] dark:text-[#808191] ">Fund the campaign</p>
+                <div className="mt-6">
+                  <FormField labelName="Amount" placeholder="ETH 0.1" inputType="number" value={amount} handleChange={(e) => setAmount(e.target.value)} />
+                  <div className="my-5 p-4 bg-[#eaeaea] dark:bg-[#13131a] rounded-xl ">
+                    <h4 className="font-epilogue font-semibold text-sm leading-[22px] text-black dark:text-white ">Empower change. Support now.</h4>
+                    <p className=" mt-5 font-epilogue font-normal leading-[22px] text-[#4d4d4d] dark:text-[#808191] ">Transform lives, shape the future. Your donation fuels progress. Join us, make an impact.</p>
+                  </div>
+                  <CustomButton
+                    btnType="button"
+                    title={remainingDays === 0 ? "Deadline Reached" : "Fund Campaign"}
+                    styles={`w-full bg-[#6F01Ec] ${remainingDays === 0 && "!text-white"}`}
+                    isDisabled={remainingDays === 0}
+                    handleClick={handleDonate}
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
