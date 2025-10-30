@@ -34,20 +34,7 @@ const CampaignDetails = () => {
   const [donators, setDonators] = useState([]);
   const [campaign, setCampaign] = useState([]);
   const [injectMetaTags, setInjectMetaTags] = useState(false);
-  const [eventHistory] = useState([
-    {
-      type: "Donation",
-      hash: "0xFakeTxHash1",
-      amount: "0.10 ETH",
-      user: "0xAbc123...789",
-    },
-    {
-      type: "Withdrawal",
-      hash: "0xFakeTxHash2",
-      amount: "0.03 ETH",
-      user: "0xOwner...Abc",
-    },
-  ]);
+  const [eventHistory, setEventHistory] = useState([]);
 
   useEffect(() => {
     if (contract) {
@@ -65,6 +52,14 @@ const CampaignDetails = () => {
   const fetchDonators = async () => {
     const data = await getDonations(campaignId);
     setDonators(data);
+    // Build event history from on-chain donations; withdrawals will be appended when available
+    const donationEvents = (data || []).map((d) => ({
+      type: "Donation",
+      user: d.donator,
+      amount: `${d.donation} ETH`,
+      hash: d.txHash || `${campaignId}-${d.donator}-${d.donation}`,
+    }));
+    setEventHistory(donationEvents);
   };
 
   const handleDonate = async () => {
@@ -279,16 +274,26 @@ const CampaignDetails = () => {
               </tr>
             </thead>
             <tbody>
-              {eventHistory.map((evt) => (
-                <tr key={evt.hash} className="hover:bg-[#2c2f32]/20 transition text-white">
-                  <td>{evt.type}</td>
-                  <td>{evt.user}</td>
-                  <td>{evt.amount}</td>
-                  <td>
-                    <a href={`https://sepolia.etherscan.io/tx/${evt.hash}`} target="_blank" rel="noopener noreferrer" className="text-[#03dac5] underline inline-flex items-center">View <ExternalLink className="w-3 h-3 ml-1" /></a>
-                  </td>
+              {eventHistory.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="text-center text-gray-400 py-4">No data as of now</td>
                 </tr>
-              ))}
+              ) : (
+                eventHistory.map((evt) => (
+                  <tr key={evt.hash} className="hover:bg-[#2c2f32]/20 transition text-white">
+                    <td>{evt.type}</td>
+                    <td>{evt.user}</td>
+                    <td>{evt.amount}</td>
+                    <td>
+                      {String(evt.hash).startsWith("0x") ? (
+                        <a href={`https://sepolia.etherscan.io/tx/${evt.hash}`} target="_blank" rel="noopener noreferrer" className="text-[#03dac5] underline inline-flex items-center">View <ExternalLink className="w-3 h-3 ml-1" /></a>
+                      ) : (
+                        <span className="text-gray-500">-</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
