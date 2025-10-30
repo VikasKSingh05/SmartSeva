@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import { Navbar } from "./components";
+import ScrollToTop from "./components/ScrollToTop";
 import Footer from "./components/Footer";
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
 
       {/* Foreground content */}
       <div className="relative z-10">
+        <ScrollToTop />
         <Navbar />
         <Outlet />
         <Footer />
