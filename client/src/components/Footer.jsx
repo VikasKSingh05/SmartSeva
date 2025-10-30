@@ -43,8 +43,8 @@ const Footer = () => {
             <div className="px-6 py-4 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400">
               <div>© {year} SmartSeva. All rights reserved.</div>
               <div className="mt-2 sm:mt-0 flex items-center gap-4">
-                <Link className="hover:text-white transition" to="/terms">Terms</Link>
-                <Link className="hover:text-white transition" to="/privacy">Privacy</Link>
+                <Link className="hover:text-white transition" to="/">Terms</Link>
+                <Link className="hover:text-white transition" to="/">Privacy</Link>
               </div>
             </div>
           </div>
