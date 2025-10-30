@@ -58,8 +58,3 @@ To use this DApp user must have an extension called [Metamask](https://metamask.
 ## Credits:
 
 https://github.com/adrianhajdin/project_crowdfunding
-
-## Contributor:
-
-1.	https://github.com/thekiranmahajan
-2.	https://github.com/thesakshijaiswal
