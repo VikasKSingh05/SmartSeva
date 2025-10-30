@@ -22,7 +22,3 @@
 
 **Thirdweb** is a tool for creating, deploying, and managing dApps on the Ethereum blockchain and **hardhat** is a development environment for Ethereum smart contract development.
 
-
-## Credits:
-
-https://github.com/adrianhajdin/project_crowdfunding
