@@ -8,8 +8,7 @@ const Profile = () => {
   const [loadingUser, setLoadingUser] = useState(false);
 
   useEffect(() => {
-    let isMounted = true; // prevents state updates after unmount
-
+    let isMounted = true; 
     const run = async () => {
       if (contract && address && isMounted) {
         setLoadingUser(true);
@@ -21,17 +20,18 @@ const Profile = () => {
     run();
 
     return () => {
-      isMounted = false; // cleanup
+      isMounted = false; 
     };
-  }, [contract, address]); // ✅ removed 'campaigns' to prevent re-fetch loop
-
+  }, [contract, address]); 
   return (
     <ProtectedRoute>
-      <DisplayCampaigns
-        title="My Campaigns"
-        isLoading={loadingUser}
-        campaigns={userCampaigns}
-      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <DisplayCampaigns
+          title="My Campaigns"
+          isLoading={loadingUser}
+          campaigns={userCampaigns}
+        />
+      </div>
     </ProtectedRoute>
   );
 };

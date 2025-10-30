@@ -11,10 +11,10 @@ const DisplayCampaigns = ({ title, isLoading, campaigns }) => {
   };
   return (
     <div className="w-full">
-      <h1 className="font-epilogue font-semibold text-lg text-black dark:text-white text-left">
+      <h1 className="font-epilogue font-semibold text-lg text-black dark:text-white text-left mb-4">
         {title} ({campaigns?.length})
       </h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-[20px] justify-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-[20px]">
         {isLoading && (
           <img
             src={loader}
@@ -29,7 +29,7 @@ const DisplayCampaigns = ({ title, isLoading, campaigns }) => {
         )}
         {!isLoading && campaigns?.length > 0 &&
           campaigns?.map((campaign) => (
-            <div key={campaign.id} className="w-full max-w-[320px]">
+            <div key={campaign.id} className="w-full max-w-[320px] mx-auto sm:mx-0">
               <FundCard
                 {...campaign}
                 handleClick={() => handleNavigateDetails(campaign)}
